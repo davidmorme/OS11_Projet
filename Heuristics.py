@@ -163,7 +163,7 @@ sns.set_context('notebook')
 f=sns.catplot(x="Heuristic", y="Error", hue='Heuristic',data=df, kind="point",
               capsize=0.2,join=False,ci='sd') 
 
-f.fig.suptitle("Mean and Standard Error of Heuristics in 5 cases",y=1.01, size=15)
+f.fig.suptitle("Mean and Standard deviation of Error of Heuristics in 5 cases",y=1.01, size=15)
 
 f.fig.set_figwidth(10)
 f.fig.set_figheight(7)

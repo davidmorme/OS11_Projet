@@ -40,7 +40,7 @@ def Scenario(s):
             D[j,i]=D[i,j]
     '''
     
-    return n, maxD, ProfitC, D
+    return n, maxD, ProfitC, D, coordXY
 
 #%%
 #### Profit ####
@@ -128,6 +128,29 @@ def RelProDist():
 def error(sumaP):
     return (Opt[s-1]-sumaP)/Opt[s-1]
 
+#%%
+
+def PlotSolution(coordXY,ProfitC,ClientsV,Title=''):
+    fig, ax= plt.subplots()
+
+    ax.plot(coordXY[0,0],coordXY[0,1],'.', markersize=10)
+    ax.plot(coordXY[1:,0],coordXY[1:,1],'.', markersize=5)
+
+    for i, P in enumerate(ProfitC):
+        ax.text(coordXY[i+1,0],coordXY[i+1,1],P)
+
+    Tourne=np.zeros((len(ClientsV)+2,2))
+    Tourne[0] = coordXY[0]
+    Tourne[-1] = coordXY[0]
+
+    j=1
+    for i in ClientsV:
+        Tourne[j]=coordXY[i]
+        j+=1
+    
+    ax.plot(Tourne[:,0],Tourne[:,1])
+    
+    fig.suptitle(Title, y=0.95)
 
 #%%
 Opt=[202,105,155,145,182] #Optimos trouvés avec GAMS (Gusek)
@@ -137,17 +160,20 @@ SolsP=[]
 
 '''Scenario wanted, the first 5 are with 10 clients and the second 5 are with 100 clients'''
 for s in range(1,6):
-    n, maxD, ProfitC, D = Scenario(s)
+    n, maxD, ProfitC, D, coordXY = Scenario(s)
 
     ClientsV ,sumaD, sumaP=BigestProfit()
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    PlotSolution(coordXY,ProfitC,ClientsV,f'Biggest Profit Heuristic, Scenario {s} Profit Total: {sumaP}')
     ClientsV ,sumaD, sumaP=PPV()
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    PlotSolution(coordXY,ProfitC,ClientsV,f'Plus Proche Voisin Heuristic, Scenario {s} Profit Total: {sumaP}')
     ClientsV ,sumaD, sumaP=RelProDist()
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    PlotSolution(coordXY,ProfitC,ClientsV,f'Profit/Distance Heuristic, Scenario {s} Profit Total: {sumaP}')
 
 df = pd.DataFrame({'Heuristic':['Biggest Profit','Plus Proche Voisin','Profit/Distance']*5, 
                    'Distancia':SolsD, 'Profit':SolsP, 
@@ -174,3 +200,6 @@ f.savefig('Error 5 petit cases.png', quality=100)
 
 plt.show()
 
+
+#%%
+PlotSolution(coordXY,ProfitC,ClientsV)

@@ -493,7 +493,7 @@ plt.show()
 PlotSolution(coordXY,ProfitC,ClientsV)
 
 #%%
-s=6
+s=5
 n, maxD, ProfitC, D, coordXY = Scenario(s)
 ClientsV ,sumaD, sumaP=BigestProfit()
 
@@ -508,3 +508,20 @@ PlotSolution(coordXY,ProfitC,ClientsV,f'Plus Proche Voisin Heuristic, Scenario {
 ClientsV=M3(ClientsV,D,ProfitC)
 sumaP=profit(ClientsV, ProfitC)
 PlotSolution(coordXY,ProfitC,ClientsV,f'Plus Proche Voisin Heuristic, Scenario {s} Profit Total: {sumaP}')
+
+#%%
+solG=[3,10,9]
+print(profit(solG, ProfitC))
+#%%
+
+''' GUSEK Solutions '''
+solsG=[[8,1,2,10,6,5,9,4],[3,10,9],[6,4,7,1,3,5,9],[4,9,6,7,3],[3,2,5,7,1,10,8]]
+ProfG=[]
+DistG=[]
+for i in range(0,len(solsG)):
+    s=i+1
+    n, maxD, ProfitC, D, coordXY = Scenario(s)
+    
+    ProfG.append(profit(solsG[i], ProfitC))
+    DistG.append(distance(solsG[i],D))
+    PlotSolution(coordXY,ProfitC,solsG[i],f'Gusek Solution, Scenario {s} Profit Total: {ProfG[i]}, Distance: {round(DistG[i],3)}')

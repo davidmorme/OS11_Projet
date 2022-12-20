@@ -46,7 +46,7 @@ def Scenario(s):
 
 #%%
 #### Profit ####
-def BigestProfit():
+def BigestProfit(D,ProfitC,maxD,n):
     order=np.argsort(-ProfitC)
     
     sumaD=0
@@ -69,7 +69,7 @@ def BigestProfit():
 
 ### Plus proche Voisin ####
 
-def PPV():
+def PPV(D,ProfitC,maxD,n):
     sumaD=0
     sumaP=0
 
@@ -96,7 +96,7 @@ def PPV():
 
 ### Profit/D ####
 
-def RelProDist():
+def RelProDist(D,ProfitC,maxD,n):
     sumaD=0
     sumaP=0
 
@@ -248,23 +248,28 @@ Opt=[202,105,155,145,182] #Optimos trouvés avec GAMS (Gusek)
 
 SolsD=[]
 SolsP=[]
+SolsClients=[]
 
 '''Scenario wanted, the first 5 are with 10 clients and the second 5 are with 100 clients'''
 for s in range(1,6):
     n, maxD, ProfitC, D, coordXY = Scenario(s)
     print(f'Starting scenario {s}')
-    ClientsV ,sumaD, sumaP=BigestProfit()
+    ClientsV ,sumaD, sumaP=BigestProfit(D,ProfitC,maxD,n)
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    SolsClients.append(ClientsV)
     ClientsV = M1(ClientsV,D)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M2(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M3(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     while True:
         MinProf=profit(ClientsV,ProfitC)
         ClientsV = M1(ClientsV,D)
@@ -273,20 +278,25 @@ for s in range(1,6):
         if profit(ClientsV,ProfitC)==MinProf: break
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     print('Finished BigestProfit')
     
-    ClientsV ,sumaD, sumaP=PPV()
+    ClientsV ,sumaD, sumaP=PPV(D,ProfitC,maxD,n)
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    SolsClients.append(ClientsV)
     ClientsV = M1(ClientsV,D)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M2(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M3(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     while True:
         MinProf=profit(ClientsV,ProfitC)
         ClientsV = M1(ClientsV,D)
@@ -295,20 +305,25 @@ for s in range(1,6):
         if profit(ClientsV,ProfitC)==MinProf: break
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     print('Finished PPV')
     
-    ClientsV ,sumaD, sumaP=RelProDist()
+    ClientsV ,sumaD, sumaP=RelProDist(D,ProfitC,maxD,n)
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    SolsClients.append(ClientsV)
     ClientsV = M1(ClientsV,D)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M2(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M3(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     while True:
         MinProf=profit(ClientsV,ProfitC)
         ClientsV = M1(ClientsV,D)
@@ -317,6 +332,7 @@ for s in range(1,6):
         if profit(ClientsV,ProfitC)==MinProf: break
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     print('Finished RelProDist')
 
 H=np.array([['Biggest Profit']*5,['Plus Proche Voisin']*5,['Profit/Distance']*5])
@@ -324,31 +340,38 @@ H=list(H.flatten())
 df = pd.DataFrame({'Scenario':sum([[i]*15 for i in list(range(1,6))],[]),
                    'Heuristic':H*5, 
                    'Modification':['Non','M1','M1, M2','M1, M2, M3','MULT']*15, 
-                   'Distancia':SolsD, 'Profit':SolsP,
-                   'Optimo':sum([[i]*15 for i in Opt],[])})
+                   'Distance':SolsD, 'Profit':SolsP,
+                   'Profit Gusek':sum([[i]*15 for i in Opt],[]),
+                   'Clients Visited':SolsClients})
 
-df['Error']=(df['Optimo']-df['Profit'])/df['Optimo']
+df['Error']=(df['Profit Gusek']-df['Profit'])/df['Profit Gusek']
+df['Nombre Clients Visited']=df['Clients Visited'].apply(lambda x: len(x))
 
 #%%
 SolsD=[]
 SolsP=[]
+SolsClients=[]
 
 '''Scenario wanted, the first 5 are with 10 clients and the second 5 are with 100 clients'''
 for s in range(6,11):
     n, maxD, ProfitC, D, coordXY = Scenario(s)
     print(f'Starting scenario {s}')
-    ClientsV ,sumaD, sumaP=BigestProfit()
+    ClientsV ,sumaD, sumaP=BigestProfit(D,ProfitC,maxD,n)
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    SolsClients.append(ClientsV)
     ClientsV = M1(ClientsV,D)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M2(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M3(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     while True:
         MinProf=profit(ClientsV,ProfitC)
         ClientsV = M1(ClientsV,D)
@@ -357,21 +380,26 @@ for s in range(6,11):
         if profit(ClientsV,ProfitC)==MinProf: break
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     
     print('Finished BigestProfit')
     
-    ClientsV ,sumaD, sumaP=PPV()
+    ClientsV ,sumaD, sumaP=PPV(D,ProfitC,maxD,n)
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    SolsClients.append(ClientsV)
     ClientsV = M1(ClientsV,D)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M2(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M3(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     while True:
         MinProf=profit(ClientsV,ProfitC)
         ClientsV = M1(ClientsV,D)
@@ -380,21 +408,26 @@ for s in range(6,11):
         if profit(ClientsV,ProfitC)==MinProf: break
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     
     print('Finished PPV')
     
-    ClientsV ,sumaD, sumaP=RelProDist()
+    ClientsV ,sumaD, sumaP=RelProDist(D,ProfitC,maxD,n)
     SolsD.append(sumaD)
     SolsP.append(sumaP)
+    SolsClients.append(ClientsV)
     ClientsV = M1(ClientsV,D)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M2(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     ClientsV = M3(ClientsV,D,ProfitC)
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     while True:
         MinProf=profit(ClientsV,ProfitC)
         ClientsV = M1(ClientsV,D)
@@ -403,6 +436,7 @@ for s in range(6,11):
         if profit(ClientsV,ProfitC)==MinProf: break
     SolsD.append(distance(ClientsV,D))
     SolsP.append(profit(ClientsV,ProfitC))
+    SolsClients.append(ClientsV)
     
     print('Finished RelProDist')
 
@@ -411,7 +445,9 @@ H=list(H.flatten())
 dfB = pd.DataFrame({'Scenario':sum([[i]*15 for i in list(range(6,11))],[]),
                    'Heuristic':H*5, 
                    'Modification':['Non','M1','M1, M2','M1, M2, M3','MULT']*15, 
-                   'Distancia':SolsD, 'Profit':SolsP})
+                   'Distance':SolsD, 'Profit':SolsP,
+                   'Clients Visited':SolsClients})
+dfB['Nombre Clients Visited']=dfB['Clients Visited'].apply(lambda x: len(x))
 
 #%%
 sns.set_style("darkgrid")
@@ -495,7 +531,7 @@ PlotSolution(coordXY,ProfitC,ClientsV)
 #%%
 s=5
 n, maxD, ProfitC, D, coordXY = Scenario(s)
-ClientsV ,sumaD, sumaP=BigestProfit()
+ClientsV ,sumaD, sumaP=BigestProfit(D,ProfitC,maxD,n)
 
 PlotSolution(coordXY,ProfitC,ClientsV,f'Plus Proche Voisin Heuristic, Scenario {s} Profit Total: {sumaP}')
 #%%

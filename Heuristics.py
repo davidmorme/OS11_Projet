@@ -10,7 +10,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-#%%
 def Scenario(s):
     if s<=5:
         n=10 #Number of clients
@@ -44,7 +43,7 @@ def Scenario(s):
     
     return n, maxD, ProfitC, D, coordXY
 
-#%%
+
 #### Profit ####
 def BigestProfit(D,ProfitC,maxD,n):
     order=np.argsort(-ProfitC)
@@ -65,7 +64,7 @@ def BigestProfit(D,ProfitC,maxD,n):
     sumaD += D[i,0]
     
     return ClientsV ,sumaD, sumaP
-#%%
+
 
 ### Plus proche Voisin ####
 
@@ -92,7 +91,7 @@ def PPV(D,ProfitC,maxD,n):
     sumaD += D[i,0]
     
     return ClientsV ,sumaD, sumaP
-#%%
+
 
 ### Profit/D ####
 
@@ -126,14 +125,10 @@ def RelProDist(D,ProfitC,maxD,n):
     
     return ClientsV ,sumaD, sumaP
 
-#%%
-def error(sumaP):
-    return (Opt[s-1]-sumaP)/Opt[s-1]
 
-#%%
 
 def PlotSolution(coordXY,ProfitC,ClientsV,Title=''):
-    fig, ax= plt.subplots()
+    fig, ax= plt.subplots(figsize=(7.5,5.5))
 
     ax.plot(coordXY[0,0],coordXY[0,1],'.', markersize=10)
     ax.plot(coordXY[1:,0],coordXY[1:,1],'.', markersize=5)
@@ -155,14 +150,17 @@ def PlotSolution(coordXY,ProfitC,ClientsV,Title=''):
     fig.suptitle(Title, y=0.95)
 
 
-#%%
+
 def distance(ClientsV,D):
     sumaD=D[0,ClientsV[0]]+D[ClientsV[-1],0]
     for i in range(1,len(ClientsV)):
         sumaD+=D[ClientsV[i-1],ClientsV[i]]
     return sumaD
- 
-#%%
+
+def profit(ClientsV,ProfitC):
+    return sum(ProfitC[list(np.array(ClientsV)-1)])  
+
+
 def M1(ClientsV,D):
     ClientsVD=[0]+ClientsV+[0]
     while True:
@@ -188,12 +186,7 @@ def M1(ClientsV,D):
     ClientsVD.remove(0)
     return ClientsVD
 
-#%%
-def profit(ClientsV,ProfitC):
-    return sum(ProfitC[list(np.array(ClientsV)-1)])
-    
 
-#%%
 def M2(ClientsV,D,ProfitC):
     while True:
         ClientsNV=list(range(1,n+1))
@@ -215,7 +208,7 @@ def M2(ClientsV,D,ProfitC):
     return ClientsV
 
 
-#%%
+
 def M3(ClientsV,D,ProfitC):
     
     while True:
@@ -457,14 +450,14 @@ sns.set_context('notebook')
 f=sns.catplot(x='Modification', y="Error", hue='Heuristic',data=df, kind="point",
               capsize=0.2,join=True,ci='sd',col="Heuristic") 
 
-f.fig.suptitle("Mean and Standard deviation of Error of Heuristics en 5 petit cases",y=1.01, size=15)
+f.fig.suptitle("Moyenne et écart-type de l'erreur de l'heuristique en 5 petits cas",y=1.01, size=15)
 
 f.fig.set_figwidth(10)
 f.fig.set_figheight(7)
 f.set_xticklabels(rotation=30)
 #f.set(xlabel="New X Label", ylabel="New Y Label")
 
-f.savefig('Error 5 petit cases and modifications.png', quality=100)
+f.savefig('Error 5 petit cases and modifications.png', quality=500)
 
 plt.show()
 
@@ -476,14 +469,14 @@ sns.set_context('notebook')
 f=sns.catplot(x='Modification', y="Profit", hue='Scenario',data=df, kind="point",
               capsize=0.2,join=True,ci='sd',col="Heuristic") 
 
-f.fig.suptitle("Profit of Heuristics en 5 petit cases",y=1.01, size=15)
+f.fig.suptitle("Profit de l'heuristique en 5 petits cas",y=1.01, size=15)
 
 f.fig.set_figwidth(10)
 f.fig.set_figheight(7)
 f.set_xticklabels(rotation=30)
 #f.set(xlabel="New X Label", ylabel="New Y Label")
 
-f.savefig('Profit 5 petit cases and modifications.png', quality=100)
+f.savefig('Profit 5 petit cases and modifications.png', quality=500)
 
 plt.show()
 
@@ -495,14 +488,14 @@ sns.set_context('notebook')
 f=sns.catplot(x='Modification', y="Profit", hue='Heuristic',data=dfB, kind="point",
               capsize=0.2,join=True,ci='sd',col="Heuristic") 
 
-f.fig.suptitle("Mean and Standard deviation of Profit of Heuristics in 5 grand cases",y=1.01, size=15)
+f.fig.suptitle("Moyenne et écart-type du profit de l'heuristique en 5 grands cas",y=1.01, size=15)
 
 f.fig.set_figwidth(10)
 f.fig.set_figheight(7)
 f.set_xticklabels(rotation=30)
 #f.set(xlabel="New X Label", ylabel="New Y Label")
 
-f.savefig('Mean Profit 5 grand cases and modifications.png', quality=100)
+f.savefig('Mean Profit 5 grand cases and modifications.png', quality=500)
 
 plt.show()
 
@@ -514,40 +507,111 @@ sns.set_context('notebook')
 f=sns.catplot(x='Modification', y="Profit", hue='Scenario',data=dfB, kind="point",
               capsize=0.2,join=True,ci='sd',col="Heuristic") 
 
-f.fig.suptitle("Profit of Heuristics in 5 grand cases",y=1.01, size=15)
+f.fig.suptitle("Profit de l'heuristique dans 5 grands cas",y=1.01, size=15)
 
 f.fig.set_figwidth(10)
 f.fig.set_figheight(7)
 f.set_xticklabels(rotation=30)
 #f.set(xlabel="New X Label", ylabel="New Y Label")
 
-f.savefig('Profit 5 grand cases and modifications.png', quality=100)
+f.savefig('Profit 5 grand cases and modifications.png', quality=500)
 
 plt.show()
 
 #%%
-PlotSolution(coordXY,ProfitC,ClientsV)
+def PlotMultipleSolution(ax,coordXY,ProfitC,ClientsV,Title=''):
+    
+    ax.plot(coordXY[0,0],coordXY[0,1],'.', markersize=10)
+    ax.plot(coordXY[1:,0],coordXY[1:,1],'.', markersize=5)
+    
+    for i, P in enumerate(ProfitC):
+        ax.text(coordXY[i+1,0],coordXY[i+1,1],P)
+    
+    Tourne=np.zeros((len(ClientsV)+2,2))
+    Tourne[0] = coordXY[0]
+    Tourne[-1] = coordXY[0]
+
+    j=1
+    for i in ClientsV:
+        Tourne[j]=coordXY[i]
+        j+=1
+    
+    ax.plot(Tourne[:,0],Tourne[:,1])
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    ax.set_title(Title,y=0.98)
+    
 
 #%%
-s=5
+s=4
+n, maxD, ProfitC, D, coordXY = Scenario(s)
+ClientsV ,sumaD, sumaP=PPV(D,ProfitC,maxD,n)
+
+fig = plt.figure(figsize=(11,9))
+ax1=fig.add_subplot(3,2,1)
+ax2=fig.add_subplot(3,2,2)
+ax3=fig.add_subplot(3,2,3)
+ax4=fig.add_subplot(3,2,4)
+ax5=fig.add_subplot(3,2,(5,6))
+
+fig.suptitle(f'Scenario {s} développé avec Plus Proche Voisin avec les différentes modifications',y=0.94)
+
+PlotMultipleSolution(ax1,coordXY,ProfitC,ClientsV,f'Modification: Non, Profit: {sumaP}, Distance: {round(sumaD,2)}')
+
+ClientsV=M1(ClientsV,D)
+SumaDN=distance(ClientsV,D)
+PlotMultipleSolution(ax2,coordXY,ProfitC,ClientsV,f'Modification: M1, Profit: {sumaP}, Distance: {round(SumaDN,2)}')
+ClientsV=M2(ClientsV,D,ProfitC)
+sumaP=profit(ClientsV, ProfitC)
+PlotMultipleSolution(ax3,coordXY,ProfitC,ClientsV,f'Modification: M2, Profit: {sumaP}, Distance: {round(distance(ClientsV,D),2)}')
+ClientsV=M3(ClientsV,D,ProfitC)
+sumaP=profit(ClientsV, ProfitC)
+PlotMultipleSolution(ax4,coordXY,ProfitC,ClientsV,f'Modification: M3, Profit: {sumaP}, Distance: {round(distance(ClientsV,D),2)}')
+while True:
+    MinProf=profit(ClientsV,ProfitC)
+    ClientsV = M1(ClientsV,D)
+    ClientsV = M2(ClientsV,D,ProfitC)
+    ClientsV = M3(ClientsV,D,ProfitC)
+    if profit(ClientsV,ProfitC)==MinProf: break
+
+PlotMultipleSolution(ax5,coordXY,ProfitC,ClientsV,f'Modification: Multiple fois, Profit: {profit(ClientsV, ProfitC)}, Distance: {round(distance(ClientsV,D),2)}')
+fig.savefig(f'Scenario {s} développé avec Plus Proche Voisin avec des modifications.png',bbox_inches='tight', pad_inches=0.15, dpi=500)
+
+#%%
+s=8
 n, maxD, ProfitC, D, coordXY = Scenario(s)
 ClientsV ,sumaD, sumaP=BigestProfit(D,ProfitC,maxD,n)
 
-PlotSolution(coordXY,ProfitC,ClientsV,f'Plus Proche Voisin Heuristic, Scenario {s} Profit Total: {sumaP}')
-#%%
+fig = plt.figure(figsize=(11,9))
+ax1=fig.add_subplot(3,2,1)
+ax2=fig.add_subplot(3,2,2)
+ax3=fig.add_subplot(3,2,3)
+ax4=fig.add_subplot(3,2,4)
+ax5=fig.add_subplot(3,2,(5,6))
+
+fig.suptitle(f'Scenario {s} développé avec Biggest Profit avec les différentes modifications',y=0.94)
+
+PlotMultipleSolution(ax1,coordXY,ProfitC,ClientsV,f'Modification: Non, Profit: {sumaP}, Distance: {round(sumaD,2)}')
+
 ClientsV=M1(ClientsV,D)
 SumaDN=distance(ClientsV,D)
-PlotSolution(coordXY,ProfitC,ClientsV,f'Plus Proche Voisin Heuristic, Scenario {s} Distance Total: {SumaDN}')
+PlotMultipleSolution(ax2,coordXY,ProfitC,ClientsV,f'Modification: M1, Profit: {sumaP}, Distance: {round(SumaDN,2)}')
 ClientsV=M2(ClientsV,D,ProfitC)
 sumaP=profit(ClientsV, ProfitC)
-PlotSolution(coordXY,ProfitC,ClientsV,f'Plus Proche Voisin Heuristic, Scenario {s} Profit Total: {sumaP}')
+PlotMultipleSolution(ax3,coordXY,ProfitC,ClientsV,f'Modification: M2, Profit: {sumaP}, Distance: {round(distance(ClientsV,D),2)}')
 ClientsV=M3(ClientsV,D,ProfitC)
 sumaP=profit(ClientsV, ProfitC)
-PlotSolution(coordXY,ProfitC,ClientsV,f'Plus Proche Voisin Heuristic, Scenario {s} Profit Total: {sumaP}')
+PlotMultipleSolution(ax4,coordXY,ProfitC,ClientsV,f'Modification: M3, Profit: {sumaP}, Distance: {round(distance(ClientsV,D),2)}')
+while True:
+    MinProf=profit(ClientsV,ProfitC)
+    ClientsV = M1(ClientsV,D)
+    ClientsV = M2(ClientsV,D,ProfitC)
+    ClientsV = M3(ClientsV,D,ProfitC)
+    if profit(ClientsV,ProfitC)==MinProf: break
 
-#%%
-solG=[3,10,9]
-print(profit(solG, ProfitC))
+PlotMultipleSolution(ax5,coordXY,ProfitC,ClientsV,f'Modification: Multiple fois, Profit: {profit(ClientsV, ProfitC)}, Distance: {round(distance(ClientsV,D),2)}')
+fig.savefig(f'Scenario {s} développé avec Biggest Profit avec des modifications.png',bbox_inches='tight', pad_inches=0.15, dpi=500)
+
 #%%
 
 ''' GUSEK Solutions '''
